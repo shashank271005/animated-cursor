@@ -5,122 +5,122 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smoke Trail Cursor</title>
     <style>
-       
+        /* Basic reset and full-screen black background */
         body, html {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden; 
+            overflow: hidden; /* Prevents scrollbars */
             background-color: #000;
         }
 
-      
+        /* The canvas will be our drawing surface */
         canvas {
             display: block;
-            
+            /* The default cursor will now be visible */
             cursor: default; 
         }
     </style>
 </head>
 <body>
-    
+    <!-- The canvas element we will draw on -->
     <canvas id="smoke-canvas"></canvas>
 
     <script>
-       
+        // --- Setup ---
         const canvas = document.getElementById('smoke-canvas');
         const ctx = canvas.getContext('2d');
 
-        
+        // Set canvas to full window size
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        
+        // Array to hold all our particles
         let particles = [];
         
-        
+        // Object to store mouse position
         const mouse = {
             x: null,
             y: null,
             isMoving: false
         };
 
-        
+        // --- Event Listeners ---
 
-        
+        // Update canvas size when window is resized
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
 
         let moveTimeout;
-        
+        // Update mouse position and track if it's moving
         window.addEventListener('mousemove', (e) => {
             mouse.x = e.x;
             mouse.y = e.y;
             mouse.isMoving = true;
             
-            
+            // Set a timeout to detect when the mouse stops
             clearTimeout(moveTimeout);
             moveTimeout = setTimeout(() => {
                 mouse.isMoving = false;
-            }, 100); 
+            }, 100); // Stop emitting after 100ms of no movement
         });
 
-       
+        // --- Particle Class ---
         class Particle {
             constructor(x, y) {
                 this.x = x;
                 this.y = y;
-                
+                // Random size
                 this.size = Math.random() * 4 + 2;
-                
+                // How long the particle will live (in frames)
                 this.life = 0;
-                this.maxLife = Math.random() * 30 + 50; 
-                
+                this.maxLife = Math.random() * 30 + 50; // 50-80 frames
+                // Random velocity
                 this.vx = (Math.random() - 0.5) * 4;
                 this.vy = (Math.random() - 0.5) * 4;
-                
+                // Color (hue in the blue/cyan range)
                 this.hue = Math.floor(Math.random() * 30) + 170; 
                 this.opacity = 1;
             }
 
             update() {
-                
+                // Move particle
                 this.x += this.vx;
                 this.y += this.vy;
 
-                
+                // Apply some friction/damping to slow it down
                 this.vx *= 0.96;
                 this.vy *= 0.96;
 
-                
+                // Age the particle
                 this.life++;
                 
-                
+                // Fade out
                 if (this.life < this.maxLife) {
                     this.opacity = 1 - (this.life / this.maxLife);
                 } else {
                     this.opacity = 0;
                 }
                 
-                
+                // Shrink
                 if (this.size > 0.1) {
                     this.size -= 0.08;
                 }
             }
 
             draw() {
-                
+                // Don't draw if it's dead
                 if (this.opacity <= 0 || this.size <= 0.1) return;
                 
                 ctx.globalAlpha = this.opacity;
-                
-                const lightness = 60 + (1 - this.opacity) * 20; 
+                // Use HSL for easy color and brightness control
+                const lightness = 60 + (1 - this.opacity) * 20; // Gets brighter as it fades
                 ctx.fillStyle = `hsl(${this.hue}, 100%, ${lightness}%)`;
                 
-                
+                // Use 'lighter' blending to make particles glow where they overlap
                 ctx.globalCompositeOperation = 'lighter'; 
 
                 ctx.beginPath();
@@ -129,12 +129,12 @@
             }
         }
 
-        
+        // --- Animation Loop ---
         function createParticles() {
-            
+            // Only create particles if the mouse is moving
             if (!mouse.isMoving || mouse.x === null) return;
             
-            /
+            // Create a small burst of particles on each frame
             const particleCount = 5; 
             for (let i = 0; i < particleCount; i++) {
                 particles.push(new Particle(mouse.x, mouse.y));
@@ -142,36 +142,42 @@
         }
 
         function animate() {
-            
-            ctx.globalCompositeOperation = 'source-over'; 
+            // 1. "Fade" the canvas
+            // Instead of clearing, draw a semi-transparent black rectangle.
+            // This creates the motion blur/trail effect.
+            ctx.globalCompositeOperation = 'source-over'; // Default blending
             ctx.globalAlpha = 1;
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'; 
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'; // The alpha value (0.1) controls the trail length
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            
+            // 2. Create new particles at the mouse position
             createParticles();
 
-            
+            // 3. Update and draw all particles
+            // Loop backwards to safely remove items
             for (let i = particles.length - 1; i >= 0; i--) {
                 const p = particles[i];
                 p.update();
                 p.draw();
 
-                
+                // 4. Remove dead particles
                 if (p.opacity <= 0 || p.size <= 0.1) {
                     particles.splice(i, 1);
                 }
             }
             
-           
-            
+            /* REMOVED: The code block for "5. Draw the custom cursor dot"
+               is no longer needed as we are using the default system cursor.
+            */
+
+            // 6. Reset global alpha (now step 5)
             ctx.globalAlpha = 1;
 
-            
+            // Loop forever
             requestAnimationFrame(animate);
         }
 
-        
+        // Start the animation!
         animate();
 
     </script>
