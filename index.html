@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smoke Trail Cursor</title>
+    <style>
+       
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; 
+            background-color: #000;
+        }
+
+      
+        canvas {
+            display: block;
+            
+            cursor: default; 
+        }
+    </style>
+</head>
+<body>
+    
+    <canvas id="smoke-canvas"></canvas>
+
+    <script>
+       
+        const canvas = document.getElementById('smoke-canvas');
+        const ctx = canvas.getContext('2d');
+
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        
+        let particles = [];
+        
+        
+        const mouse = {
+            x: null,
+            y: null,
+            isMoving: false
+        };
+
+        
+
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        let moveTimeout;
+        
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+            mouse.isMoving = true;
+            
+            
+            clearTimeout(moveTimeout);
+            moveTimeout = setTimeout(() => {
+                mouse.isMoving = false;
+            }, 100); 
+        });
+
+       
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                
+                this.size = Math.random() * 4 + 2;
+                
+                this.life = 0;
+                this.maxLife = Math.random() * 30 + 50; 
+                
+                this.vx = (Math.random() - 0.5) * 4;
+                this.vy = (Math.random() - 0.5) * 4;
+                
+                this.hue = Math.floor(Math.random() * 30) + 170; 
+                this.opacity = 1;
+            }
+
+            update() {
+                
+                this.x += this.vx;
+                this.y += this.vy;
+
+                
+                this.vx *= 0.96;
+                this.vy *= 0.96;
+
+                
+                this.life++;
+                
+                
+                if (this.life < this.maxLife) {
+                    this.opacity = 1 - (this.life / this.maxLife);
+                } else {
+                    this.opacity = 0;
+                }
+                
+                
+                if (this.size > 0.1) {
+                    this.size -= 0.08;
+                }
+            }
+
+            draw() {
+                
+                if (this.opacity <= 0 || this.size <= 0.1) return;
+                
+                ctx.globalAlpha = this.opacity;
+                
+                const lightness = 60 + (1 - this.opacity) * 20; 
+                ctx.fillStyle = `hsl(${this.hue}, 100%, ${lightness}%)`;
+                
+                
+                ctx.globalCompositeOperation = 'lighter'; 
+
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        
+        function createParticles() {
+            
+            if (!mouse.isMoving || mouse.x === null) return;
+            
+            /
+            const particleCount = 5; 
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle(mouse.x, mouse.y));
+            }
+        }
+
+        function animate() {
+            
+            ctx.globalCompositeOperation = 'source-over'; 
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            
+            createParticles();
+
+            
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw();
+
+                
+                if (p.opacity <= 0 || p.size <= 0.1) {
+                    particles.splice(i, 1);
+                }
+            }
+            
+           
+            
+            ctx.globalAlpha = 1;
+
+            
+            requestAnimationFrame(animate);
+        }
+
+        
+        animate();
+
+    </script>
+</body>
+</html>
+
+
