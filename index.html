@@ -26,27 +26,25 @@
     <canvas id="smoke-canvas"></canvas>
 
     <script>
-        // --- Setup ---
+        
         const canvas = document.getElementById('smoke-canvas');
         const ctx = canvas.getContext('2d');
 
-        // Set canvas to full window size
+        
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        // Array to hold all our particles
+        
         let particles = [];
         
-        // Object to store mouse position
+        
         const mouse = {
             x: null,
             y: null,
             isMoving: false
         };
 
-        // --- Event Listeners ---
-
-        // Update canvas size when window is resized
+        
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
