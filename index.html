@@ -51,17 +51,17 @@
         });
 
         let moveTimeout;
-        // Update mouse position and track if it's moving
+        
         window.addEventListener('mousemove', (e) => {
             mouse.x = e.x;
             mouse.y = e.y;
             mouse.isMoving = true;
             
-            // Set a timeout to detect when the mouse stops
+            
             clearTimeout(moveTimeout);
             moveTimeout = setTimeout(() => {
                 mouse.isMoving = false;
-            }, 100); // Stop emitting after 100ms of no movement
+            }, 100); 
         });
 
         // --- Particle Class ---
