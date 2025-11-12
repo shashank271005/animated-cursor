@@ -122,10 +122,10 @@
 
         // --- Animation Loop ---
         function createParticles() {
-            // Only create particles if the mouse is moving
+
             if (!mouse.isMoving || mouse.x === null) return;
             
-            // Create a small burst of particles on each frame
+
             const particleCount = 5; 
             for (let i = 0; i < particleCount; i++) {
                 particles.push(new Particle(mouse.x, mouse.y));
@@ -133,25 +133,19 @@
         }
 
         function animate() {
-            // 1. "Fade" the canvas
-            // Instead of clearing, draw a semi-transparent black rectangle.
-            // This creates the motion blur/trail effect.
-            ctx.globalCompositeOperation = 'source-over'; // Default blending
+
+            ctx.globalCompositeOperation = 'source-over'; 
             ctx.globalAlpha = 1;
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'; // The alpha value (0.1) controls the trail length
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 2. Create new particles at the mouse position
             createParticles();
 
-            // 3. Update and draw all particles
-            // Loop backwards to safely remove items
             for (let i = particles.length - 1; i >= 0; i--) {
                 const p = particles[i];
                 p.update();
                 p.draw();
 
-                // 4. Remove dead particles
                 if (p.opacity <= 0 || p.size <= 0.1) {
                     particles.splice(i, 1);
                 }
