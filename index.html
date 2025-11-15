@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smoke Trail Cursor</title>
-    <style>
+    <style>    
         
         body, html {
             margin: 0;   
@@ -143,7 +143,7 @@
 
             for (let i = particles.length - 1; i >= 0; i--) {
                 const p = particles[i];
-                p.update();
+                p.update();    
                 p.draw();
 
                 if (p.opacity <= 0 || p.size <= 0.1) {
@@ -151,11 +151,7 @@
                 }
             }
             
-            /* REMOVED: The code block for "5. Draw the custom cursor dot"
-               is no longer needed as we are using the default system cursor.
-            */
-
-            // 6. Reset global alpha (now step 5)
+       
             ctx.globalAlpha = 1;
 
             // Loop forever
