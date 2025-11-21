@@ -97,7 +97,7 @@
                 }
                 
                
-                if (this.size > 0.1) {
+                if (this.size > 0.1) {    
                     this.size -= 0.08;
                 }
             }
@@ -120,7 +120,7 @@
             }
         }
 
-        // --- Animation Loop ---
+        
         function createParticles() {
 
             if (!mouse.isMoving || mouse.x === null) return;
@@ -154,11 +154,10 @@
        
             ctx.globalAlpha = 1;
 
-            // Loop forever
             requestAnimationFrame(animate);
         }
 
-        // Start the animation!
+
         animate();
 
     </script>
